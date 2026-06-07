@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Заявки</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;background:#f1f5f9;color:#0f172a;-webkit-font-smoothing:antialiased;padding:28px 24px;line-height:1.5}
+.wrap{max-width:1600px;margin:0 auto}
+.card{background:#fff;border:1px solid #eef2f6;border-radius:20px;box-shadow:0 1px 3px rgba(15,23,42,.04),0 1px 2px rgba(15,23,42,.03)}
+.head{display:flex;align-items:center;gap:16px;padding:24px 30px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px}
+.brand .logo{color:#2563eb}
+.brand h1{font-size:26px;font-weight:700;letter-spacing:-.01em}
+.head .right{margin-left:auto;display:flex;align-items:center;gap:12px}
+.role-wrap{position:relative}
+.role-pill{display:inline-flex;align-items:center;gap:5px;font-size:14px;font-weight:600;color:#2563eb;background:#eff6ff;padding:7px 13px;border-radius:10px;border:none;cursor:pointer;font-family:inherit}
+.role-pill:hover{background:#dbeafe}
+.role-menu{position:absolute;top:calc(100% + 8px);right:0;background:#fff;border:1px solid #e2e8f0;border-radius:14px;box-shadow:0 12px 32px rgba(15,23,42,.14);min-width:230px;z-index:40;overflow:hidden;padding:5px}
+.ritem{display:flex;flex-direction:column;gap:1px;width:100%;text-align:left;background:none;border:none;cursor:pointer;padding:10px 14px;border-radius:10px;font-family:inherit}
+.ritem:hover{background:#f1f5f9}
+.ritem b{font-size:14px;font-weight:600;color:#0f172a}
+.ritem span{font-size:12px;color:#94a3b8}
+.ritem.cur b{color:#2563eb}
+.role-sep{height:1px;background:#eef2f6;margin:4px 8px}
+.rout{display:flex;align-items:center;gap:8px;width:100%;text-align:left;background:none;border:none;cursor:pointer;padding:10px 14px;border-radius:10px;font-family:inherit;font-size:14px;color:#e11d48}
+.rout:hover{background:#fff1f2}
+.gear{color:#94a3b8;background:none;border:none;cursor:pointer;display:flex;padding:5px;border-radius:8px}
+.gear:hover{background:#f1f5f9;color:#64748b}
+.divider{width:1px;height:24px;background:#e2e8f0}
+.user{font-size:15px;font-weight:600;color:#0f172a;white-space:nowrap}
+.pencil{background:none;border:none;cursor:pointer;color:#94a3b8;display:inline-flex;padding:4px;border-radius:6px}
+.pencil:hover{color:#64748b;background:#f1f5f9}
+.tabs{display:flex;gap:10px;padding:0 30px 4px;flex-wrap:wrap}
+.tab{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:11px 16px;font-size:15px;font-weight:500;color:#475569;cursor:pointer;transition:all .12s;font-family:inherit}
+.tab:hover{border-color:#cbd5e1}
+.tab .cnt{font-size:13px;font-weight:600;color:#64748b;background:#f1f5f9;border-radius:8px;padding:2px 9px;min-width:24px;text-align:center}
+.tab.active{border-color:#2563eb;color:#2563eb;box-shadow:0 0 0 1px #2563eb}
+.tab.active .cnt{background:#2563eb;color:#fff}
+.search{display:flex;align-items:center;gap:12px;margin:16px 30px 8px;background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:14px 18px}
+.search svg{color:#94a3b8;flex-shrink:0}
+.search input{border:none;outline:none;font-size:16px;font-family:inherit;color:#0f172a;width:100%;background:transparent}
+.search input::placeholder{color:#94a3b8}
+.hint{color:#94a3b8;font-size:14px;padding:8px 30px 4px}
+.tbl{padding:4px 14px 16px}
+.thead,.row{display:grid;grid-template-columns:180px 1.1fr 1.8fr .85fr .8fr 120px;gap:18px;align-items:center}
+.thead{padding:14px 16px;border-bottom:1px solid #eef2f6;color:#94a3b8;font-size:14px;font-weight:500}
+.row{padding:18px 16px;border-bottom:1px solid #f1f5f9;cursor:pointer;transition:background .1s;border-radius:10px}
+.row:last-child{border-bottom:none}
+.row:hover{background:#f8fafc}
+.cell-id{color:#2563eb;font-weight:600;font-size:15px}
+.cell-name{color:#0f172a;font-size:15px}
+.cell-obj,.cell-type,.cell-sum{color:#475569;font-size:15px}
+.badge{display:inline-block;font-size:13px;font-weight:600;padding:5px 11px;border-radius:8px;white-space:nowrap}
+.b-pending{background:#fffbeb;color:#d97706}
+.b-approved{background:#f0fdf4;color:#16a34a}
+.b-rejected{background:#fff1f2;color:#e11d48}
+.b-issued{background:#eff6ff;color:#2563eb}
+.empty{padding:48px;text-align:center;color:#94a3b8;font-size:15px}
+.back{display:inline-flex;align-items:center;gap:8px;background:none;border:none;color:#64748b;font-size:15px;font-family:inherit;cursor:pointer;padding:6px 0;margin-bottom:10px}
+.back:hover{color:#0f172a}
+.d-head{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:20px}
+.d-head h2{font-size:24px;font-weight:700}
+.doc-btn{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid #dbeafe;color:#2563eb;font-weight:600;font-size:14px;font-family:inherit;border-radius:12px;padding:10px 16px;cursor:pointer}
+.doc-btn:hover{background:#eff6ff}
+.doc-btn.off{border-color:#e2e8f0;color:#94a3b8;cursor:not-allowed}
+.d-grid{display:grid;grid-template-columns:1.7fr 1fr;gap:20px;align-items:start}
+.d-grid.solo{grid-template-columns:1fr}
+.panel{background:#fff;border:1px solid #eef2f6;border-radius:16px;padding:22px 26px;box-shadow:0 1px 3px rgba(15,23,42,.04)}
+.drow{display:flex;gap:16px;padding:14px 0;border-bottom:1px solid #f5f7fa}
+.drow:last-child{border-bottom:none}
+.drow .k{width:180px;flex-shrink:0;color:#94a3b8;font-size:15px}
+.drow .v{color:#0f172a;font-size:15px;flex:1}
+.sub{color:#94a3b8;font-size:14px;margin-top:2px}
+.posrow{padding:14px 0;border-bottom:1px solid #f5f7fa}
+.posrow .k{color:#94a3b8;font-size:15px;margin-bottom:8px}
+.posbox{background:#f8fafc;border-radius:12px;padding:16px 18px;white-space:pre-line;color:#334155;font-size:15px;line-height:1.7}
+.sum{font-weight:700;font-size:18px}
+.side-title{font-size:16px;font-weight:600;margin-bottom:14px}
+.d-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.btn{font-family:inherit;font-size:15px;font-weight:600;border:none;border-radius:12px;padding:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .12s}
+.btn-approve{background:#16a34a;color:#fff}
+.btn-approve:hover{background:#15803d}
+.btn-reject{background:#e11d48;color:#fff}
+.btn-reject:hover{background:#be123c}
+.btn-issue{background:#2563eb;color:#fff;width:100%}
+.btn-issue:hover{background:#1d4ed8}
+.side-label{font-size:14px;color:#475569;margin-bottom:6px}
+textarea.comment{width:100%;height:96px;resize:none;border:1px solid #e2e8f0;border-radius:12px;padding:12px 14px;font-family:inherit;font-size:15px;color:#0f172a;outline:none}
+textarea.comment:focus{border-color:#93c5fd;box-shadow:0 0 0 3px #eff6ff}
+.side-note{display:flex;gap:8px;align-items:flex-start;margin-top:12px;color:#94a3b8;font-size:13px}
+.side-note svg{margin-top:2px;flex-shrink:0}
+.err{color:#e11d48;font-size:13px;margin-top:8px}
+.notice{border-radius:12px;padding:16px 18px;font-size:15px;margin-bottom:18px}
+.notice b{display:block;margin-bottom:4px}
+.notice p{font-size:14px;color:#64748b}
+.n-green{background:#f0fdf4}.n-green b{color:#16a34a}
+.n-blue{background:#eff6ff}.n-blue b{color:#2563eb}
+.n-red{background:#fff1f2}.n-red b{color:#e11d48}
+.n-amber{background:#fffbeb}.n-amber b{color:#b45309}
+.overlay{position:fixed;inset:0;background:rgba(15,23,42,.45);display:flex;align-items:center;justify-content:center;padding:20px;z-index:100}
+.modal{background:#fff;border-radius:18px;padding:24px 26px;max-width:440px;width:100%}
+.m-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.m-head b{font-size:17px}
+.m-close{background:none;border:none;cursor:pointer;color:#94a3b8;display:flex;padding:4px}
+.m-status{border-radius:12px;padding:12px 14px;font-size:14px;margin-bottom:16px}
+.m-status.ok{background:#f0fdf4;color:#16a34a}
+.m-status.warn{background:#fffbeb;color:#b45309}
+.m-label{font-size:14px;color:#475569;margin-bottom:6px}
+.m-input{width:100%;border:1px solid #e2e8f0;border-radius:12px;padding:11px 14px;font-family:inherit;font-size:15px;outline:none}
+.m-input:focus{border-color:#93c5fd;box-shadow:0 0 0 3px #eff6ff}
+.m-actions{display:flex;gap:10px;align-items:center;margin-top:16px}
+.m-ghost{background:none;border:1px solid #e2e8f0;border-radius:12px;padding:11px 16px;font-family:inherit;font-size:14px;color:#475569;cursor:pointer}
+.m-ghost:hover{background:#f8fafc}
+.m-err{color:#e11d48;font-size:13px;margin-top:10px}
+.gate{min-height:90vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.gate-card{background:#fff;border:1px solid #eef2f6;border-radius:20px;box-shadow:0 8px 30px rgba(15,23,42,.08);padding:30px;max-width:420px;width:100%}
+.gate-brand{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:6px}
+.gate-brand .logo{color:#2563eb}
+.gate-brand h1{font-size:24px;font-weight:700}
+.gate-title{text-align:center;color:#94a3b8;font-size:15px;margin-bottom:20px}
+.gate-role{display:flex;flex-direction:column;gap:2px;width:100%;text-align:left;background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:14px 16px;cursor:pointer;font-family:inherit;margin-bottom:10px;transition:all .12s}
+.gate-role:hover{border-color:#2563eb;background:#f8faff}
+.gate-role b{font-size:16px;font-weight:600;color:#0f172a}
+.gate-role span{font-size:13px;color:#94a3b8}
+/* ===== АДАПТИВ + ОТДЕЛЬНЫЙ МОБИЛЬНЫЙ ВИД ===== */
+/* В режиме ПК таблица не ломается на узких экранах — прокручивается по горизонтали */
+.tbl{overflow-x:auto}
+.thead,.row{min-width:760px}
+@media (max-width:560px){ body{padding:12px 8px} }
+
+/* Кнопка переключения формата ПК <-> Телефон */
+.dev-toggle{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:7px 12px;font-family:inherit;font-size:14px;font-weight:600;color:#475569;cursor:pointer;white-space:nowrap}
+.dev-toggle:hover{background:#f8fafc;border-color:#cbd5e1}
+.dev-toggle svg{flex-shrink:0}
+.d-topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.d-topbar .back{margin-bottom:0}
+
+/* Карточка списка (мобильный вид) */
+.mcard{display:flex;align-items:center;justify-content:space-between;gap:14px;background:#fff;border:1px solid #eef2f6;border-radius:16px;padding:17px 18px;cursor:pointer;transition:background .1s}
+.mcard:hover{background:#f8fafc}
+.mcard:active{background:#f1f5f9}
+.mcard .mleft{min-width:0}
+.mcard .mid{color:#2563eb;font-weight:700;font-size:18px;letter-spacing:-.01em}
+.mcard .mmeta{color:#64748b;font-size:14px;margin-top:4px;line-height:1.5;word-break:break-word}
+.mcard .badge{flex-shrink:0}
+
+/* ======= МОБИЛЬНЫЙ ВИД (body.dev-mobile) ======= */
+body.dev-mobile{padding:0;background:#fff}
+body.dev-mobile .wrap{max-width:560px;padding-top:8px}
+body.dev-mobile .card{border:none;border-radius:0;box-shadow:none;background:#fff}
+body.dev-mobile .head{padding:16px 16px 6px;gap:10px}
+body.dev-mobile .brand .logo{display:none}
+body.dev-mobile .brand h1{font-size:30px}
+body.dev-mobile .right{gap:8px}
+body.dev-mobile .divider,body.dev-mobile .user,body.dev-mobile .pencil{display:none}
+body.dev-mobile .role-pill{font-size:14px;padding:8px 13px}
+body.dev-mobile .dev-toggle{padding:8px;gap:0}
+body.dev-mobile .dev-toggle span{display:none}
+
+body.dev-mobile .tabs{flex-wrap:nowrap;overflow-x:auto;gap:9px;padding:6px 16px 8px;scrollbar-width:none}
+body.dev-mobile .tabs::-webkit-scrollbar{display:none}
+body.dev-mobile .tab{flex-direction:column;align-items:center;gap:7px;min-width:74px;padding:11px 10px 10px;border-radius:14px}
+body.dev-mobile .tab .cnt{min-width:26px;border-radius:999px;padding:2px 9px}
+body.dev-mobile .tab.active{background:#eff6ff}
+
+body.dev-mobile .search{margin:8px 16px 6px;border-radius:14px;padding:14px 16px}
+body.dev-mobile .hint{display:none}
+
+body.dev-mobile .tbl{padding:6px 16px 28px;overflow:visible}
+body.dev-mobile .thead{display:none}
+body.dev-mobile #rows{display:flex;flex-direction:column;gap:10px}
+body.dev-mobile .empty{padding:40px 16px}
+
+/* детали на телефоне */
+body.dev-mobile .d-topbar{padding:0 16px}
+body.dev-mobile .d-head{padding:0 16px;margin-bottom:14px}
+body.dev-mobile .d-head h2{font-size:22px}
+body.dev-mobile .d-grid{grid-template-columns:1fr;padding:0 16px;gap:14px}
+body.dev-mobile .panel{padding:18px;border-radius:16px}
+body.dev-mobile .drow{flex-direction:column;gap:3px}
+body.dev-mobile .drow .k{width:auto}
+body.dev-mobile .doc-btn{margin-left:0!important;width:100%;justify-content:center}
+body.dev-mobile .d-actions{grid-template-columns:1fr 1fr;gap:10px}
+body.dev-mobile .btn{padding:14px}
+
+/* вход на телефоне */
+body.dev-mobile .gate{padding:24px 16px;min-height:80vh}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+/* ====== НАСТРОЙКИ ====== */
+var API_URL = "https://script.google.com/macros/s/AKfycbzP3q6d2zDbegTJgUYA9IRJpm-IY8lF_eW5blP0ZDwYOThdtQ8s-C3iC1LxX6tLPjcq4g/exec";
+
+/* Отделы и пароли. Чтобы добавить новый отдел — допишите строку по образцу.
+   seesAll:true  — видит все заявки и может одобрять/отклонять (руководитель).
+   owners:[...]  — отдел видит ТОЛЬКО заявки, где «От кого (ФИО)» совпадает с этими именами (только просмотр). */
+var ROLES = [
+  { id:"manager", name:"Руководитель", person:"Идрис Алиев",     pass:"1234", seesAll:true },
+  { id:"supply",  name:"Снабжение",    person:"Отдел снабжения", pass:"0000", owners:["Рамахан"] }
+  /* пример нового отдела:
+  ,{ id:"buh", name:"Бухгалтерия", person:"Бухгалтерия", pass:"2222", owners:["ФИО сотрудника"] } */
+];
+/* ======================= */
+
+var IC = {
+  clip:'<svg class="logo" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12h6"/><path d="M9 16h6"/></svg>',
+  gear:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>',
+  search:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>',
+  arrow:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>',
+  check:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+  x:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>',
+  xs:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>',
+  chev:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>',
+  pencil:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>',
+  lock:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
+  out:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>',
+  box:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>',
+  doc:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>',
+  monitor:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>',
+  phone:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg>'
+};
+
+var DEMO = [
+  {row:2,id:"2026-06-0001",regDate:"03.06.2026, 21:00",initiator:"Рамахан",role:"Производитель работ",object:"Реконструкция аэропорта Махачкала-Уйташ",type:"Материалы",docDate:"22.05.2026",addressee:"АО «Мостоотряд-99», И.А. Алиеву",positions:"1. Уголок 125×80×10 — 5 п.м.\n2. Полоса 10×100 С245 — 85 п.м.\n3. Болт М16×80 — 20 шт.",count:3,amount:0,note:"Комплекс ППО ВС ПОЖ",status:"approved",managerComment:"Согласовано",decidedAt:"04.06.2026, 10:00",fileUrl:"https://drive.google.com/"},
+  {row:3,id:"2026-06-0002",regDate:"03.06.2026, 10:00",initiator:"Рамахан",role:"Прораб",object:"Реконструкция аэропорта Махачкала-Уйташ",type:"Материалы",docDate:"01.06.2026",addressee:"АО «Мостоотряд-99», И.А. Алиеву",positions:"1. Цемент М500 — 30 меш.\n2. Песок — 5 т",count:2,amount:0,note:"",status:"pending",managerComment:"",decidedAt:"",fileUrl:"https://drive.google.com/"},
+  {row:4,id:"2026-06-0003",regDate:"02.06.2026, 09:30",initiator:"Рамахан",role:"Мастер",object:"Комплекс летней спецодежды и обуви",type:"Спецодежда",docDate:"31.05.2026",addressee:"АО «Мостоотряд-99», И.А. Алиеву",positions:"1. Куртка рабочая — 6 шт.\n2. Ботинки — 6 пар",count:2,amount:0,note:"",status:"approved",managerComment:"Согласовано",decidedAt:"03.06.2026, 14:00",fileUrl:"https://drive.google.com/"},
+  {row:5,id:"2026-06-0004",regDate:"01.06.2026, 16:00",initiator:"Рамахан",role:"Прораб",object:"Реконструкция аэропорта Махачкала-Уйташ",type:"Материалы",docDate:"01.06.2026",addressee:"АО «Мостоотряд-99», И.А. Алиеву",positions:"1. Арматура d12 — 1.5 т",count:1,amount:0,note:"",status:"pending",managerComment:"",decidedAt:"",fileUrl:"https://drive.google.com/"},
+  {row:6,id:"2026-06-0005",regDate:"30.05.2026, 11:00",initiator:"Рамахан",role:"Производитель работ",object:"Всесезонный туристско-рекреационный комплекс «Каспийский прибрежный кластер», Республика Дагестан",type:"Материалы",docDate:"29.05.2026",addressee:"АО «Мостоотряд-99», И.А. Алиеву",positions:"1. Щебень фр. 20–40 — 40 т",count:1,amount:0,note:"",status:"pending",managerComment:"",decidedAt:"",fileUrl:"https://drive.google.com/"},
+  {row:7,id:"2026-06-0006",regDate:"29.05.2026, 13:00",initiator:"Рамахан",role:"Мастер",object:"ЛОС-2",type:"Материалы",docDate:"28.05.2026",addressee:"АО «Мостоотряд-99», И.А. Алиеву",positions:"1. Гипсокартон — 60 листов",count:1,amount:0,note:"",status:"pending",managerComment:"",decidedAt:"",fileUrl:""},
+  {row:8,id:"2026-06-0007",regDate:"28.05.2026, 12:00",initiator:"Рамахан",role:"Прораб",object:"Реконструкция аэропорта Махачкала (Уйташ)",type:"Материалы",docDate:"27.05.2026",addressee:"АО «Мостоотряд-99», И.А. Алиеву",positions:"1. Профиль ПН 50 — 80 шт.",count:1,amount:0,note:"",status:"pending",managerComment:"",decidedAt:"",fileUrl:"https://drive.google.com/"},
+  {row:9,id:"2026-06-0008",regDate:"27.05.2026, 09:00",initiator:"Рамахан",role:"Мастер",object:"Всесезонный туристско-рекреационный комплекс «Каспийский прибрежный кластер», Республика Дагестан",type:"Материалы",docDate:"26.05.2026",addressee:"АО «Мостоотряд-99», И.А. Алиеву",positions:"1. Саморезы — 5 уп.",count:1,amount:0,note:"",status:"pending",managerComment:"",decidedAt:"",fileUrl:"https://drive.google.com/"}
+];
+
+var state = { requests: DEMO.slice(), filter:"all", query:"", selectedId:null, apiUrl:API_URL, connected:false, view:"gate" };
+var currentRoleId = null;
+var menuOpen = false;
+
+var STKEY = {"Ожидает":"pending","Одобрено":"approved","Отклонено":"rejected","Выдано":"issued"};
+var LABEL = {pending:"Ожидает",approved:"Одобрено",rejected:"Отклонено",issued:"Выдано"};
+var BCLS = {pending:"b-pending",approved:"b-approved",rejected:"b-rejected",issued:"b-issued"};
+
+function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c];}); }
+function fmtSum(a){ a=Number(a)||0; return a>0 ? a.toLocaleString("ru-RU")+" \u20bd" : "\u2014"; }
+function getRole(id){ for(var i=0;i<ROLES.length;i++){ if(ROLES[i].id===id) return ROLES[i]; } return null; }
+function roleObj(){ return getRole(currentRoleId); }
+function isManager(){ var r=roleObj(); return !!(r && r.seesAll); }
+function displayName(){ var r=roleObj(); if(!r) return ""; return localStorage.getItem("zayavki_name_"+r.id) || r.person; }
+
+/* ===== ВИД: ПК / ТЕЛЕФОН ===== */
+function deviceStored(){ try{ return localStorage.getItem("zayavki_device"); }catch(e){ return null; } }
+function resolvedDevice(){ var s=deviceStored(); if(s==="mobile"||s==="desktop") return s; return (window.innerWidth<=768)?"mobile":"desktop"; }
+function isMobileView(){ return resolvedDevice()==="mobile"; }
+function applyDevice(){ document.body.classList.toggle("dev-mobile", isMobileView()); document.body.classList.toggle("dev-desktop", !isMobileView()); }
+function setDevice(mode){ try{ localStorage.setItem("zayavki_device", mode); }catch(e){} applyDevice(); rerenderCurrent(); }
+function toggleDevice(){ setDevice(isMobileView()?"desktop":"mobile"); }
+function rerenderCurrent(){ closeRoleMenu(); if(state.view==="detail") showDetail(); else if(state.view==="gate"||!currentRoleId) showGate(); else showList(); }
+function deviceToggleHTML(){ return isMobileView() ? '<button class="dev-toggle" id="devToggle" title="Вид для ПК">'+IC.monitor+'<span>ПК</span></button>' : '<button class="dev-toggle" id="devToggle" title="Вид для телефона">'+IC.phone+'<span>Телефон</span></button>'; }
+function bindDeviceToggle(){ var b=document.getElementById("devToggle"); if(b) b.addEventListener("click",toggleDevice); }
+
+function pickFileUrl(r){
+  var keys=["Ссылка на файл","Ссылка на документ","Ссылка на фото","Файл","Документ","Ссылка","URL","Drive","Фото"];
+  for(var i=0;i<keys.length;i++){ var v=r[keys[i]]; if(v && /^https?:\/\//i.test(String(v).trim())) return String(v).trim(); }
+  var f=r["Имя файла"]; if(f && /^https?:\/\//i.test(String(f).trim())) return String(f).trim();
+  return "";
+}
+
+function normalize(r){
+  var status = STKEY[String(r["Статус"]||"").trim()] || "pending";
+  return {
+    row: r.row,
+    id: String(r["№ заявки"]||""),
+    regDate: r["Дата записи"]||"",
+    initiator: r["От кого (ФИО)"]||"—",
+    role: r["Должность"]||"",
+    object: r["Объект / участок"]||"—",
+    type: r["Тип заявки"]||"Прочее",
+    docDate: r["Дата документа"]||"",
+    addressee: r["Кому / организация"]||"",
+    positions: r["Позиции (состав заявки)"]||"",
+    count: Number(r["Кол-во позиций"]||0),
+    amount: Number(String(r["Сумма"]||"0").replace(/[^\d.]/g,""))||0,
+    note: r["Примечание"]||"",
+    status: status,
+    managerComment: r["Комментарий руководителя"]||"",
+    decidedAt: r["Дата решения"]||"",
+    file: r["Имя файла"]||"",
+    fileUrl: pickFileUrl(r)
+  };
+}
+
+function visibleRequests(){
+  var role=roleObj();
+  if(!role) return [];
+  if(role.seesAll) return state.requests;
+  var owners=(role.owners||[]).map(function(s){return String(s).toLowerCase();});
+  return state.requests.filter(function(r){ return owners.indexOf(String(r.initiator).toLowerCase())>-1; });
+}
+
+function counts(){
+  var v=visibleRequests();
+  var c={all:v.length,pending:0,approved:0,rejected:0,issued:0};
+  v.forEach(function(r){ if(c[r.status]!=null) c[r.status]++; });
+  return c;
+}
+
+function tabsHTML(){
+  var c=counts();
+  var defs=[["all","Все",c.all],["pending","Ожидают",c.pending],["approved","Одобрено",c.approved],["rejected","Отклонено",c.rejected],["issued","Выдано",c.issued]];
+  return defs.map(function(d){
+    return '<button class="tab '+(state.filter===d[0]?"active":"")+'" data-tab="'+d[0]+'"><span>'+d[1]+'</span><span class="cnt">'+d[2]+'</span></button>';
+  }).join("");
+}
+
+function roleMenuHTML(){
+  var items=ROLES.map(function(r){
+    return '<button class="ritem '+(r.id===currentRoleId?"cur":"")+'" data-role="'+r.id+'"><b>'+esc(r.name)+'</b><span>'+esc(r.person)+'</span></button>';
+  }).join("");
+  return '<div class="role-menu" id="roleMenu">'+items+'<div class="role-sep"></div><button class="rout" id="logoutBtn">'+IC.out+'<span>Выйти</span></button></div>';
+}
+
+function rowHTML(r){
+  return '<div class="row" data-id="'+esc(r.id)+'" role="button" tabindex="0">'
+    +'<div class="cell-id" data-label="№ заявки">#'+esc(r.id)+'</div>'
+    +'<div class="cell-name" data-label="От кого">'+esc(r.initiator)+'</div>'
+    +'<div class="cell-obj" data-label="Объект">'+esc(r.object)+'</div>'
+    +'<div class="cell-type" data-label="Тип">'+esc(r.type)+'</div>'
+    +'<div class="cell-sum" data-label="Сумма">'+fmtSum(r.amount)+'</div>'
+    +'<div data-label="Статус"><span class="badge '+BCLS[r.status]+'">'+LABEL[r.status]+'</span></div>'
+    +'</div>';
+}
+
+function cardHTML(r){
+  var meta = esc(r.initiator) + ((r.object && r.object!=="\u2014") ? ' \u00b7 '+esc(r.object) : '');
+  return '<div class="mcard" data-id="'+esc(r.id)+'" role="button" tabindex="0">'
+    +'<div class="mleft"><div class="mid">#'+esc(r.id)+'</div><div class="mmeta">'+meta+'</div></div>'
+    +'<span class="badge '+BCLS[r.status]+'">'+LABEL[r.status]+'</span>'
+    +'</div>';
+}
+
+function renderRows(){
+  var list = visibleRequests().filter(function(r){
+    if(state.filter!=="all" && r.status!==state.filter) return false;
+    if(state.query){ var q=state.query.toLowerCase(); var fields=[r.id,r.initiator,r.object,r.type,r.positions]; if(!fields.some(function(v){return String(v).toLowerCase().indexOf(q)>-1;})) return false; }
+    return true;
+  });
+  var el=document.getElementById("rows");
+  if(!el) return;
+  el.innerHTML = list.length ? list.map(isMobileView()?cardHTML:rowHTML).join("") : '<div class="empty">Ничего не найдено</div>';
+}
+
+/* ===== ВХОД / ОТДЕЛЫ ===== */
+function showGate(){
+  state.view="gate"; menuOpen=false;
+  var roles=ROLES.map(function(r){ return '<button class="gate-role" data-role="'+r.id+'"><b>'+esc(r.name)+'</b><span>'+esc(r.person)+'</span></button>'; }).join("");
+  document.getElementById("root").innerHTML =
+    '<div class="gate"><div class="gate-card">'
+    +'<div class="gate-brand">'+IC.clip+'<h1>Заявки</h1></div>'
+    +'<div class="gate-title">Выберите отдел для входа</div>'+roles+'</div></div>';
+  var btns=document.querySelectorAll(".gate-role");
+  for(var i=0;i<btns.length;i++){ btns[i].addEventListener("click",function(){ askPassword(this.dataset.role); }); }
+}
+
+function askPassword(roleId){
+  var role=getRole(roleId); if(!role) return;
+  var ov=document.createElement("div"); ov.className="overlay";
+  ov.innerHTML='<div class="modal">'
+    +'<div class="m-head"><b>Вход — '+esc(role.name)+'</b><button class="m-close" id="pClose">'+IC.xs+'</button></div>'
+    +'<div class="m-label">Пароль отдела</div>'
+    +'<input class="m-input" id="pPass" type="password" placeholder="Введите пароль" autofocus>'
+    +'<div class="m-actions"><button class="btn btn-issue" id="pOk" style="width:auto;padding:11px 22px;">Войти</button></div>'
+    +'<div class="m-err" id="pErr"></div></div>';
+  document.body.appendChild(ov);
+  function close(){ ov.remove(); }
+  ov.addEventListener("click",function(e){ if(e.target===ov) close(); });
+  document.getElementById("pClose").addEventListener("click",close);
+  var inp=document.getElementById("pPass"); inp.focus();
+  function submit(){
+    if(inp.value===role.pass){ close(); setRole(roleId); }
+    else { document.getElementById("pErr").textContent="Неверный пароль"; inp.value=""; inp.focus(); }
+  }
+  document.getElementById("pOk").addEventListener("click",submit);
+  inp.addEventListener("keydown",function(e){ if(e.key==="Enter") submit(); });
+}
+
+function setRole(id){
+  currentRoleId=id;
+  localStorage.setItem("zayavki_role", id);
+  state.filter="all"; state.query=""; state.selectedId=null;
+  showList();
+}
+
+function logout(){ localStorage.removeItem("zayavki_role"); currentRoleId=null; showGate(); }
+
+/* ===== СПИСОК ===== */
+function showList(){
+  state.view="list"; menuOpen=false;
+  var nm=displayName(), role=roleObj();
+  document.getElementById("root").innerHTML =
+    '<div class="wrap"><div class="card">'
+    +'<div class="head"><div class="brand">'+IC.clip+'<h1>Заявки</h1></div>'
+    +'<div class="right"><div class="role-wrap"><button class="role-pill" id="rolePill">'+esc(role.name)+IC.chev+'</button></div>'
+    +deviceToggleHTML()
+    +'<button class="gear" id="gearBtn" aria-label="Настройки">'+IC.gear+'</button>'
+    +'<span class="divider"></span><span class="user" id="userName">'+esc(nm)+'</span>'
+    +'<button class="pencil" id="editName" aria-label="Изменить имя">'+IC.pencil+'</button></div></div>'
+    +'<div class="tabs" id="tabs">'+tabsHTML()+'</div>'
+    +'<div class="search">'+IC.search+'<input id="search" placeholder="Поиск по номеру, сотруднику или объекту" value="'+esc(state.query)+'"></div>'
+    +(isMobileView()?'':'<div class="hint">Нажмите на заявку, чтобы открыть детали.</div>')
+    +'<div class="tbl">'+(isMobileView()?'':'<div class="thead"><div>№ заявки</div><div>От кого</div><div>Объект</div><div>Тип</div><div>Сумма</div><div>Статус</div></div>')
+    +'<div id="rows"></div></div>'
+    +'</div></div>';
+  renderRows();
+
+  document.getElementById("tabs").addEventListener("click",function(e){
+    var b=e.target.closest("[data-tab]"); if(!b) return;
+    state.filter=b.dataset.tab;
+    var all=document.querySelectorAll("#tabs .tab");
+    for(var i=0;i<all.length;i++){ all[i].classList.toggle("active", all[i].dataset.tab===state.filter); }
+    renderRows();
+  });
+  document.getElementById("search").addEventListener("input",function(e){ state.query=e.target.value; renderRows(); });
+  document.getElementById("gearBtn").addEventListener("click",openSettings);
+  bindDeviceToggle();
+  document.getElementById("editName").addEventListener("click",function(){
+    var cur=displayName(); var v=prompt("Имя пользователя:", cur);
+    if(v!=null && v.trim()){ localStorage.setItem("zayavki_name_"+currentRoleId, v.trim()); var u=document.getElementById("userName"); if(u) u.textContent=v.trim(); }
+  });
+
+  document.getElementById("rolePill").addEventListener("click",function(e){ e.stopPropagation(); toggleRoleMenu(); });
+
+  var rows=document.getElementById("rows");
+  rows.addEventListener("click",function(e){ var row=e.target.closest("[data-id]"); if(row){ state.selectedId=row.dataset.id; showDetail(); } });
+  rows.addEventListener("keydown",function(e){ if(e.key==="Enter"){ var row=e.target.closest("[data-id]"); if(row){ state.selectedId=row.dataset.id; showDetail(); } } });
+}
+
+function toggleRoleMenu(){
+  var wrap=document.querySelector(".role-wrap");
+  if(menuOpen){ var m=document.getElementById("roleMenu"); if(m) m.remove(); menuOpen=false; return; }
+  wrap.insertAdjacentHTML("beforeend", roleMenuHTML());
+  menuOpen=true;
+  var menu=document.getElementById("roleMenu");
+  menu.querySelectorAll(".ritem").forEach(function(b){
+    b.addEventListener("click",function(e){ e.stopPropagation(); var id=this.dataset.role; closeRoleMenu(); if(id!==currentRoleId) askPassword(id); });
+  });
+  document.getElementById("logoutBtn").addEventListener("click",function(e){ e.stopPropagation(); closeRoleMenu(); logout(); });
+  setTimeout(function(){ document.addEventListener("mousedown", awayClose); },0);
+}
+function awayClose(e){ if(!e.target.closest(".role-wrap")) closeRoleMenu(); }
+function closeRoleMenu(){ var m=document.getElementById("roleMenu"); if(m) m.remove(); menuOpen=false; document.removeEventListener("mousedown", awayClose); }
+
+/* ===== КАРТОЧКА ===== */
+function drow(k,v){ return '<div class="drow"><div class="k">'+k+'</div><div class="v">'+v+'</div></div>'; }
+
+function dataPanelHTML(r){
+  var h='';
+  h+=drow("От кого", esc(r.initiator)+(r.role?'<div class="sub">'+esc(r.role)+'</div>':''));
+  h+=drow("Объект", esc(r.object));
+  h+=drow("Тип", esc(r.type));
+  if(r.docDate) h+=drow("Дата документа", esc(r.docDate));
+  if(r.addressee) h+=drow("Кому", esc(r.addressee));
+  if(r.amount>0) h+=drow("Сумма", '<span class="sum">'+fmtSum(r.amount)+'</span>');
+  h+='<div class="posrow"><div class="k">Позиции ('+(r.count||0)+')</div><div class="posbox">'+(esc(r.positions)||"—")+'</div></div>';
+  if(r.note) h+=drow("Примечание", esc(r.note));
+  if(r.managerComment) h+=drow("Решение руководителя", '<div class="posbox">'+esc(r.managerComment)+'</div>');
+  return h;
+}
+
+function managerSideHTML(r,err){
+  if(r.status==="pending"){
+    return '<div class="side-title">Ваше решение</div>'
+      +'<div class="d-actions"><button class="btn btn-approve" id="approveBtn">'+IC.check+'<span>Одобрить</span></button>'
+      +'<button class="btn btn-reject" id="rejectBtn">'+IC.x+'<span>Отклонить</span></button></div>'
+      +'<div class="side-label">Комментарий руководителя</div>'
+      +'<textarea class="comment" id="comment" maxlength="500" placeholder="Добавьте комментарий…"></textarea>'
+      +(err?'<div class="err">'+esc(err)+'</div>':'')
+      +'<div class="side-note">'+IC.lock+'<span>Решение уйдёт в снабжение и заявителю.</span></div>';
+  }
+  if(r.status==="approved"){
+    return '<div class="notice n-green"><b>Заявка одобрена</b><p>Передана в снабжение по объекту «'+esc(r.object)+'».</p></div>'
+      +'<button class="btn btn-issue" id="issueBtn">'+IC.box+'<span>Отметить выданным</span></button>';
+  }
+  if(r.status==="issued") return '<div class="notice n-blue"><b>Материалы выданы</b><p>Заявка исполнена.</p></div>';
+  return '<div class="notice n-red"><b>Заявка отклонена</b><p>Заявитель получил уведомление.</p></div>';
+}
+
+function deptNoticeHTML(r){
+  if(r.status==="pending") return '<div class="notice n-amber"><b>Ожидает решения</b><p>Заявка на рассмотрении у руководителя.</p></div>';
+  if(r.status==="approved") return '<div class="notice n-green"><b>Заявка одобрена</b><p>Решение руководителя — ниже.</p></div>';
+  if(r.status==="issued") return '<div class="notice n-blue"><b>Материалы выданы</b><p>Заявка исполнена.</p></div>';
+  return '<div class="notice n-red"><b>Заявка отклонена</b><p>Причина — в комментарии ниже.</p></div>';
+}
+
+function showDetail(err){
+  state.view="detail"; menuOpen=false;
+  var r=null;
+  for(var i=0;i<state.requests.length;i++){ if(state.requests[i].id===state.selectedId){ r=state.requests[i]; break; } }
+  if(!r){ state.selectedId=null; showList(); return; }
+
+  var docBtn = r.fileUrl
+    ? '<button class="doc-btn" id="docBtn" style="margin-left:auto">'+IC.doc+'<span>Открыть документ</span></button>'
+    : '<button class="doc-btn off" id="docBtn" style="margin-left:auto" title="Документ не прикреплён">'+IC.doc+'<span>Документ не прикреплён</span></button>';
+
+  var body;
+  if(isManager()){
+    body='<div class="d-grid"><div class="panel">'+dataPanelHTML(r)+'</div>'
+        +'<div class="panel">'+managerSideHTML(r,err)+'</div></div>';
+  } else {
+    body='<div class="d-grid solo"><div class="panel">'+deptNoticeHTML(r)+dataPanelHTML(r)+'</div></div>';
+  }
+
+  document.getElementById("root").innerHTML =
+    '<div class="wrap">'
+    +'<div class="d-topbar"><button class="back" id="backBtn">'+IC.arrow+'<span>Назад</span></button>'+deviceToggleHTML()+'</div>'
+    +'<div class="d-head"><h2>Заявка #'+esc(r.id)+'</h2><span class="badge '+BCLS[r.status]+'">'+LABEL[r.status]+'</span>'+docBtn+'</div>'
+    +body+'</div>';
+
+  document.getElementById("backBtn").addEventListener("click",function(){ state.selectedId=null; showList(); });
+  bindDeviceToggle();
+  var db=document.getElementById("docBtn"); if(db && r.fileUrl) db.addEventListener("click",function(){ window.open(r.fileUrl,"_blank"); });
+  var ab=document.getElementById("approveBtn"); if(ab) ab.addEventListener("click",function(){ var c=document.getElementById("comment").value; decide(r.id,"approve",c); });
+  var rb=document.getElementById("rejectBtn"); if(rb) rb.addEventListener("click",function(){ var c=document.getElementById("comment").value; if(!c.trim()){ showDetail("Укажите причину отклонения"); return; } decide(r.id,"reject",c); });
+  var ib=document.getElementById("issueBtn"); if(ib) ib.addEventListener("click",function(){ issue(r.id); });
+}
+
+function decide(id,decision,comment){
+  var r=null;
+  state.requests=state.requests.map(function(x){
+    if(x.id!==id) return x;
+    r=x; x.status = decision==="approve" ? "approved" : "rejected"; x.managerComment=comment; x.decidedAt="Только что"; return x;
+  });
+  postUpdate(r?r.row:null, decision==="approve"?"Одобрено":"Отклонено", comment);
+  showDetail();
+}
+function issue(id){
+  var r=null;
+  state.requests=state.requests.map(function(x){ if(x.id!==id) return x; r=x; x.status="issued"; return x; });
+  postUpdate(r?r.row:null, "Выдано", r?r.managerComment:"");
+  showDetail();
+}
+
+/* ===== СОЕДИНЕНИЕ ===== */
+function fetchData(url,cb){
+  fetch(url).then(function(res){ return res.json(); }).then(function(rows){
+    if(!Array.isArray(rows)) throw new Error("bad");
+    state.requests = rows.map(normalize);
+    state.connected = true;
+    if(state.view==="list") showList();
+    else if(state.view==="detail") showDetail();
+    if(cb) cb(true);
+  }).catch(function(){
+    state.connected = false;
+    if(cb) cb(false);
+  });
+}
+function postUpdate(row,statusLabel,comment){
+  if(!state.apiUrl || !row) return;
+  fetch(state.apiUrl,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({row:row,status:statusLabel,comment:comment||""})}).catch(function(){});
+}
+
+function openSettings(){
+  var ov=document.createElement("div"); ov.className="overlay";
+  ov.innerHTML='<div class="modal">'
+    +'<div class="m-head"><b>Подключение к Google Таблице</b><button class="m-close" id="mClose">'+IC.xs+'</button></div>'
+    +'<div class="m-status '+(state.connected?"ok":"warn")+'">'+(state.connected?"Подключено ✓ — данные из вашей таблицы":"Демо-режим — показаны тестовые заявки")+'</div>'
+    +'<div class="m-label">Ссылка веб-приложения (Apps Script, .../exec)</div>'
+    +'<input class="m-input" id="mUrl" value="'+esc(state.apiUrl)+'" placeholder="https://script.google.com/macros/s/…/exec">'
+    +'<div class="m-actions"><button class="btn btn-issue" id="mConnect" style="width:auto;padding:11px 20px;">Подключить</button>'
+    +'<button class="m-ghost" id="mReset">По умолчанию</button></div>'
+    +'<div class="m-err" id="mErr"></div></div>';
+  document.body.appendChild(ov);
+  function close(){ ov.remove(); }
+  ov.addEventListener("click",function(e){ if(e.target===ov) close(); });
+  document.getElementById("mClose").addEventListener("click",close);
+  document.getElementById("mConnect").addEventListener("click",function(){
+    var u=document.getElementById("mUrl").value.trim();
+    if(!u){ document.getElementById("mErr").textContent="Вставьте ссылку"; return; }
+    document.getElementById("mConnect").textContent="Подключаю…"; state.apiUrl=u;
+    fetchData(u,function(ok){ if(ok){ close(); } else { document.getElementById("mErr").textContent="Не удалось подключиться. Проверьте ссылку и доступ «Всем»."; var b=document.getElementById("mConnect"); if(b) b.textContent="Подключить"; } });
+  });
+  document.getElementById("mReset").addEventListener("click",function(){
+    state.apiUrl=API_URL; document.getElementById("mUrl").value=API_URL;
+    fetchData(API_URL,function(ok){ if(ok) close(); });
+  });
+}
+
+/* ===== СТАРТ ===== */
+(function init(){
+  applyDevice();
+  var stored=localStorage.getItem("zayavki_role");
+  if(stored && getRole(stored)){ currentRoleId=stored; showList(); }
+  else { showGate(); }
+  fetchData(API_URL);
+  var rt; window.addEventListener("resize", function(){
+    if(deviceStored()) return;
+    clearTimeout(rt);
+    rt=setTimeout(function(){ var b=document.body.classList.contains("dev-mobile"); applyDevice(); if(b!==document.body.classList.contains("dev-mobile")) rerenderCurrent(); },180);
+  });
+})();
+</script>
+</body>
+</html>
