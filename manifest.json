@@ -1,0 +1,16 @@
+{
+  "name": "Заявки",
+  "short_name": "Заявки",
+  "start_url": "/M099/applications.html",
+  "scope": "/M099/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "icons": [
+    {
+      "src": "/M099/icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
